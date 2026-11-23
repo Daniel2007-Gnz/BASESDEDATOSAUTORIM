@@ -42,7 +42,7 @@ El archivo `database/autorim_admin.sql` crea este administrador:
 
 | Dato              | Valor               |
 |-------------------|---------------------|
-| Correo            | `admin@autorim.com` |
+| Correo            | `admin1@autorim.com` |
 | Contraseña        | `Admin12345`        |
 | Código de acceso  | `AUTORIM-2026`      |
 
