@@ -6,13 +6,14 @@ import { tires, tireSizes, addToCart, fmt } from '../store'
 
 const route = useRoute()
 const tire = computed(() => tires.find(t => t.id === route.params.id) || tires[0])
-const size = ref(tireSizes[1])
+const size = ref(tireSizes.find(s => s.l === '245/40 R18') || tireSizes[0])
 const added = ref(false)
 watch(tire, () => (added.value = false))
 const price = computed(() => Math.round((tire.value.price * size.value.f) / 1000) * 1000)
 
 function add() {
-  addToCart({ name: `Llanta ${tire.value.name}`, detail: `Set de 4 · ${size.value.l}`, price: price.value, tire: tire.value })
+  addToCart({ name: `Llanta ${tire.value.name}`, detail: `Set de 4 · ${size.value.l}`, price: price.value, tire: tire.value,
+    pedido: { tipo: 'llantas', llantaId: tire.value.dbId, medidaLlantaId: size.value.id } })
   added.value = true
 }
 </script>

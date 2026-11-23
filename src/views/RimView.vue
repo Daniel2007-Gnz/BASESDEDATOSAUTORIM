@@ -7,17 +7,19 @@ import { rims, tires, finishes, sizes, addToCart, fmt } from '../store'
 const route = useRoute()
 const base = computed(() => rims.find(r => r.id == route.params.id) || rims[0])
 const finish = ref(base.value.finish)
-const size = ref(sizes[1])
+const size = ref(sizes.find(s => s.l === '18"') || sizes[0])
 const width = ref('8.5J')
 const added = ref(false)
 watch(base, b => { finish.value = b.finish; added.value = false })
 
 const rim = computed(() => ({ ...base.value, finish: finish.value }))
-const finishName = computed(() => finishes.find(f => f.hex === finish.value)?.name || 'Original')
+const isOriginal = computed(() => finish.value === base.value.finish)
+const finishName = computed(() => (isOriginal.value ? 'Original' : finishes.find(f => f.hex === finish.value)?.name || 'Original'))
 const price = computed(() => Math.round((base.value.price * size.value.f) / 1000) * 1000)
 
 function add() {
-  addToCart({ name: base.value.name, detail: `Set de 4 · ${finishName.value} · ${size.value.l} · ${width.value}`, price: price.value, rim: rim.value })
+  addToCart({ name: base.value.name, detail: `Set de 4 · ${finishName.value} · ${size.value.l} · ${width.value}`, price: price.value, rim: rim.value,
+    pedido: { tipo: 'rines', rinId: base.value.id, acabadoId: isOriginal.value ? null : finishes.find(f => f.hex === finish.value)?.id ?? null, medidaRinId: size.value.id, ancho: width.value } })
   added.value = true
 }
 </script>

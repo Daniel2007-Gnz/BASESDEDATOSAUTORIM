@@ -20,3 +20,10 @@ h1,h2,h3,h4,h5,.brand{font-family:'Oswald',sans-serif;text-transform:uppercase;l
 .swatch{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);padding:0}
 .swatch.on{outline:2px solid var(--red);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){.wheel{animation:none}.car-svg .body{transition:none}}
+/* Impresión del reporte de auditoría: fondo blanco, sin menú, pie ni controles */
+@media print{
+  nav,footer,.no-print{display:none!important}
+  body,.panel{background:#fff!important}
+  *{color:#000!important;border-color:#999!important}
+  .table{--bs-table-bg:#fff;--bs-table-color:#000}
+}

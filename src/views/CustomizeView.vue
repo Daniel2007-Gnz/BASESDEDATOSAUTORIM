@@ -19,6 +19,7 @@ function add() {
     detail: `${colorName.value} · ${rim.value.name} · ${tire.value.name}`,
     price: price.value,
     cfg: { body: car.value.body, color: color.value, rim: rim.value, tire: tire.value },
+    pedido: { tipo: 'kit', autoId: car.value.id, colorId: colors.find(c => c.hex === color.value)?.id ?? null, rinId: rim.value.id, llantaId: tire.value.dbId },
   })
   router.push('/carrito')
 }

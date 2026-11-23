@@ -1,26 +1,26 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { store } from '../store'
+import { login } from '../store'
+import { api } from '../api'
 const router = useRouter()
 const mode = ref('login') // login | register | notfound
 const f = ref({ email: '', password: '', confirm: '' })
 const error = ref('')
+const busy = ref(false)
 
-function submit() {
+async function submit() {
   error.value = ''
-  const email = f.value.email.trim().toLowerCase()
-  if (mode.value === 'login') {
-    const u = store.users.find(u => u.email === email)
-    if (!u) { mode.value = 'notfound'; return }
-    if (u.password !== f.value.password) { error.value = 'La contraseña no es correcta.'; return }
-  } else {
-    if (f.value.password !== f.value.confirm) { error.value = 'Las contraseñas no coinciden.'; return }
-    if (store.users.some(u => u.email === email)) { error.value = 'Ese correo ya tiene una cuenta.'; return }
-    store.users.push({ email, password: f.value.password }) // solo demo
-  }
-  store.user = { email }
-  router.push('/')
+  if (mode.value === 'register' && f.value.password !== f.value.confirm) { error.value = 'Las contraseñas no coinciden.'; return }
+  busy.value = true
+  try {
+    const body = { email: f.value.email, password: f.value.password }
+    login(await api(mode.value === 'login' ? '/auth/login' : '/auth/register', { method: 'POST', body }))
+    router.push('/')
+  } catch (e) {
+    if (e.code === 'no_account') mode.value = 'notfound'
+    else error.value = e.message
+  } finally { busy.value = false }
 }
 </script>
 
@@ -44,7 +44,7 @@ function submit() {
         <div><label class="form-label small" for="em">Correo</label><input id="em" v-model="f.email" type="email" class="form-control" required /></div>
         <div><label class="form-label small" for="pw">Contraseña</label><input id="pw" v-model="f.password" type="password" minlength="6" class="form-control" required /></div>
         <div v-if="mode === 'register'"><label class="form-label small" for="cf">Confirmar contraseña</label><input id="cf" v-model="f.confirm" type="password" class="form-control" required /></div>
-        <button class="btn btn-red">{{ mode === 'login' ? 'Ingresar' : 'Crear cuenta' }}</button>
+        <button class="btn btn-red" :disabled="busy">{{ mode === 'login' ? 'Ingresar' : 'Crear cuenta' }}</button>
       </form>
     </div>
   </div>

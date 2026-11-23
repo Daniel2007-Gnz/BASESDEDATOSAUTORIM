@@ -1,13 +1,16 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { store, cartTotal, fmt } from '../store'
+import { store, cartTotal, fmt, logout } from '../store'
+import { api } from '../api'
 
 const router = useRouter()
 const SHIPPING = 25000
 const total = computed(() => cartTotal.value + SHIPPING)
 const f = ref({ name: '', address: '', city: '', state: '', phone: '', card: '', holder: '', exp: '', cvv: '' })
 const orderId = ref('')
+const busy = ref(false)
+const error = ref('')
 
 onMounted(() => { if (!store.user) router.replace('/login') })
 
@@ -17,15 +20,29 @@ const fmtExp = () => {
   f.value.exp = d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d
 }
 
-function pay() {
-  orderId.value = 'AR-' + Date.now().toString().slice(-6)
-  // Nunca guardes datos de tarjeta: solo el resumen del pedido
-  store.orders.push({
-    id: orderId.value, date: new Date().toLocaleString('es-CO'), email: store.user.email,
-    ship: `${f.value.address}, ${f.value.city}`, total: total.value,
-    items: store.cart.map(i => `${i.name} x${i.qty}`),
-  })
-  store.cart = []
+async function pay() {
+  error.value = ''
+  busy.value = true
+  try {
+    // Nunca se envían ni se guardan datos de tarjeta: solo la dirección y los productos.
+    // El servidor recalcula nombres y precios desde la base de datos.
+    // Solo salen la marca y los últimos 4 dígitos; nunca el número completo ni el CVV.
+    const digits = f.value.card.replace(/\D/g, '')
+    const marca = digits[0] === '4' ? 'visa' : /^(5[1-5]|2[2-7])/.test(digits) ? 'mastercard' : 'otra'
+    const r = await api('/pedidos', {
+      method: 'POST',
+      body: {
+        envio: { name: f.value.name, address: f.value.address, city: f.value.city, state: f.value.state, phone: f.value.phone },
+        items: store.cart.map(i => ({ pedido: i.pedido, qty: i.qty })),
+        pago: { marca, ultimos4: digits.slice(-4) },
+      },
+    })
+    orderId.value = r.codigo
+    store.cart = []
+  } catch (e) {
+    if (e.status === 401) { logout(); router.push('/login'); return }
+    error.value = e.message
+  } finally { busy.value = false }
 }
 </script>
 
@@ -81,7 +98,8 @@ function pay() {
           <div class="d-flex justify-content-between align-items-baseline my-3">
             <span>Total</span><strong class="fs-4 text-red">{{ fmt(total) }}</strong>
           </div>
-          <button class="btn btn-red w-100">Confirmar pago</button>
+          <div v-if="error" class="alert alert-danger py-2 small">{{ error }}</div>
+          <button class="btn btn-red w-100" :disabled="busy">{{ busy ? 'Procesando…' : 'Confirmar pago' }}</button>
         </aside>
       </div>
     </form>

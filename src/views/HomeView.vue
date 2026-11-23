@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import Wheel from '../components/Wheel.vue'
-import { rims, tires, addToCart, fmt } from '../store'
+import { rims, tires, sizes, addToCart, fmt } from '../store'
 const hero = ref(rims[1])
 const cats = [
   ['Rines deportivos', 'Ligeros y de alto desempeño', '/rin/1'],
@@ -10,7 +10,11 @@ const cats = [
   ['Llantas off-road', 'Para terreno exigente', '/llanta/off'],
 ]
 const why = [['Envío en 24 horas', 'Despachamos a todo el país.'], ['Garantía completa', 'Cobertura en cada set de rines.'], ['Instalación profesional', 'Montaje y balanceo con técnicos.']]
-const add = r => addToCart({ name: r.name, detail: 'Set de 4 rines · 18"', price: Math.round(r.price * 1.1 / 1000) * 1000, rim: r })
+const add = r => {
+  const m = sizes.find(s => s.l === '18"') || sizes[0]
+  addToCart({ name: r.name, detail: `Set de 4 rines · ${m.l}`, price: Math.round(r.price * m.f / 1000) * 1000, rim: r,
+    pedido: { tipo: 'rines', rinId: r.id, acabadoId: null, medidaRinId: m.id, ancho: '8.5J' } })
+}
 </script>
 
 <template>

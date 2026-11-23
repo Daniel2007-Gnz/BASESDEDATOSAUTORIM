@@ -1,5 +1,5 @@
 <script setup>
-import { store, cartCount } from './store'
+import { store, cartCount, logout } from './store'
 </script>
 
 <template>
@@ -16,7 +16,7 @@ import { store, cartCount } from './store'
         </ul>
         <div class="d-flex gap-2 align-items-center">
           <router-link v-if="!store.user" to="/login" class="btn btn-sm btn-outline-light">Ingresar</router-link>
-          <button v-else class="btn btn-sm btn-outline-light" @click="store.user = null">{{ store.user.email.split('@')[0] }} · Salir</button>
+          <button v-else class="btn btn-sm btn-outline-light" @click="logout">{{ store.user.email.split('@')[0] }} · Salir</button>
           <router-link to="/carrito" class="btn btn-sm btn-red position-relative">
             Carrito <span v-if="cartCount" class="badge text-bg-light ms-1">{{ cartCount }}</span>
           </router-link>
