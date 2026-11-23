@@ -8,7 +8,7 @@
        npm install
        npm run dev        # web en http://localhost:5173 + API en http://127.0.0.1:3001
 
-4. Crear el administrador (el código y la clave se guardan con hash en MB_DG_USUARIOS):
+4. Crear el administrador (opción rápida con XAMPP: importar `database/autorim_admin.sql` en phpMyAdmin; datos dentro del archivo). O por comando (el código y la clave se guardan con hash en MB_DG_USUARIOS):
 
        npm run crear-admin -- admin@autorim.com "UnaClaveSegura1" "CODIGO-DE-ACCESO"
 

@@ -40,10 +40,13 @@ watch(() => store.cart, v => localStorage.setItem('ar_cart', JSON.stringify(v)),
 watch(() => store.user, v => localStorage.setItem('ar_user', JSON.stringify(v)))
 watch(() => store.admin, v => localStorage.setItem('ar_admin', JSON.stringify(v)))
 
-export function login({ token, user }) { setToken('user', token); store.user = { email: user.email } }
+export function login({ token, user }) { setToken('user', token); store.user = { email: user.email, rol: user.rol || 'cliente' } }
 export function logout() { setToken('user', null); store.user = null }
 export function adminLogin(token) { setToken('admin', token); store.admin = true }
 export function adminLogout() { setToken('admin', null); store.admin = false }
+
+// Se muestra el acceso al panel si hay sesión de administrador activa o si el usuario que ingresó tiene rol 'admin'.
+export const esAdmin = computed(() => store.admin || store.user?.rol === 'admin')
 
 export const cartCount = computed(() => store.cart.reduce((s, i) => s + i.qty, 0))
 export const cartTotal = computed(() => store.cart.reduce((s, i) => s + i.price * i.qty, 0))

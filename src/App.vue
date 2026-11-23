@@ -1,5 +1,5 @@
 <script setup>
-import { store, cartCount, logout } from './store'
+import { store, cartCount, logout, esAdmin } from './store'
 </script>
 
 <template>
@@ -13,6 +13,7 @@ import { store, cartCount, logout } from './store'
           <li class="nav-item"><router-link class="nav-link text-secondary" to="/autos">Autos</router-link></li>
           <li class="nav-item"><router-link class="nav-link text-secondary" to="/rin/1">Rines</router-link></li>
           <li class="nav-item"><router-link class="nav-link text-secondary" to="/llanta/sport">Llantas</router-link></li>
+          <li v-if="esAdmin" class="nav-item"><router-link class="nav-link fw-semibold" style="color:var(--red,#e11d2e)" to="/admin">Panel de administración</router-link></li>
         </ul>
         <div class="d-flex gap-2 align-items-center">
           <router-link v-if="!store.user" to="/login" class="btn btn-sm btn-outline-light">Ingresar</router-link>

@@ -15,8 +15,10 @@ async function submit() {
   busy.value = true
   try {
     const body = { email: f.value.email, password: f.value.password }
-    login(await api(mode.value === 'login' ? '/auth/login' : '/auth/register', { method: 'POST', body }))
-    router.push('/')
+    const r = await api(mode.value === 'login' ? '/auth/login' : '/auth/register', { method: 'POST', body })
+    login(r)
+    // Un administrador pasa directo al panel (allí confirma con su código de acceso).
+    router.push(r.user?.rol === 'admin' ? '/admin' : '/')
   } catch (e) {
     if (e.code === 'no_account') mode.value = 'notfound'
     else error.value = e.message

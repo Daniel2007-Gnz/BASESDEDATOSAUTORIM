@@ -6,7 +6,8 @@ import TablasCrud from '../components/admin/TablasCrud.vue'
 import Reportes from '../components/admin/Reportes.vue'
 import AuditoriaReport from '../components/admin/AuditoriaReport.vue'
 
-const f = ref({ email: '', password: '', code: '' })
+// Si ya ingresó como admin por la pantalla normal, se rellena el correo.
+const f = ref({ email: store.user?.rol === 'admin' ? store.user.email : '', password: '', code: '' })
 const error = ref('')
 const resumen = ref({ pedidos: 0, clientes: 0 })
 const pedidos = ref([])
